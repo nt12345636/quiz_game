@@ -1,0 +1,51 @@
+ScreenManager:
+
+<QuizScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 20
+        spacing: 15
+
+        Label:
+            text: root.question
+            font_size: 30
+            bold: True
+
+        BoxLayout:
+            orientation: 'vertical'
+            spacing: 10
+
+            Button:
+                text: root.options[0] if root.options else ""
+                on_release: root.check_answer(self.text)
+
+            Button:
+                text: root.options[1] if root.options else ""
+                on_release: root.check_answer(self.text)
+
+            Button:
+                text: root.options[2] if root.options else ""
+                on_release: root.check_answer(self.text)
+
+            Button:
+                text: root.options[3] if root.options else ""
+                on_release: root.check_answer(self.text)
+
+<ResultScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 20
+        spacing: 15
+
+        Label:
+            text: "Your Score: " + str(root.final_score)
+            font_size: 40
+            bold: True
+
+        Button:
+            text: "Play Again"
+            on_release:
+                root.manager.current = "quiz"
+                root.manager.get_screen("quiz").score = 0
+                root.manager.get_screen("quiz").q_index = 0
+                root.manager.get_screen("quiz").on_pre_enter()
