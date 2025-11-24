@@ -1,40 +1,21 @@
-name: Build Kivy APK
+name: Build Kivy APK (Docker)
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-    - name: Install needed system packages
+    - name: Run Buildozer inside Docker (fixes AIDL error)
       run: |
-        sudo apt update
-        sudo apt install -y wget unzip openjdk-17-jdk python3 python3-pip build-essential git zip
-
-    - name: Install Android SDK
-      run: |
-        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmd-tools.zip
-        mkdir -p $HOME/android-sdk/cmdline-tools
-        unzip cmd-tools.zip -d $HOME/android-sdk/cmdline-tools
-        mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
-
-        yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/android-sdk "platform-tools" "platforms;android-33" "build-tools;33.0.2"
-
-    - name: Install Python deps
-      run: |
-        pip install --upgrade pip
-        pip install cython buildozer
-
-    - name: Build APK
-      run: |
-        export ANDROIDSDK=$HOME/android-sdk
-        export ANDROIDNDK=$HOME/android-sdk/ndk/25.2.9519653
-        buildozer android debug
+        docker run --rm -v ${{ github.workspace }}:/app kivy/buildozer android debug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
